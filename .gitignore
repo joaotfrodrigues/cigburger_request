@@ -1,0 +1,10 @@
+*/config/development
+*/logs/log-*.php
+!*/logs/index.html
+!system/cache/*
+!*/cache/index.html
+!*/cache/.htaccess
+
+vendor/
+writable/debugbar/*
+writable/session/*
