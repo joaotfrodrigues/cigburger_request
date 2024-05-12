@@ -97,8 +97,11 @@ define('EVENT_PRIORITY_HIGH', 10);
 // CUSTOM CONSTANTS
 // ---------------------------------------------------------------------------------------------------------------------
 
-// app name
+// APP NAME
 define('APP_NAME', 'CIG REQUEST');
 
 // ENCRYPTION KEY
 define('ENCRYPTION_KEY', 'pQa50gITVuVZpFXDRXrB7xzhXIrx3LLU');
+
+// IMAGES FROM API URL
+define('API_IMAGES_URL', 'http://localhost/cigburger_backoffice/public/assets/images/products/');

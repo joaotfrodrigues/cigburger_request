@@ -8,7 +8,30 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class Main extends BaseController
 {
-    // run when the machine boots
+    public function index()
+    {
+        // teste api
+        $api = new ApiModel();
+
+        echo '<pre>';
+        print_r($api->get_status());
+    }
+
+    /**
+     * Initialize the application by loading configuration settings, validating them,
+     * and preparing the application for use.
+     * 
+     * This function loads configuration settings from a JSON file, validates
+     * those settings to ensure they are complete and in the correct format, and then
+     * prepares the application for use based on the configuration. If any errors
+     * occur during the initialization process, an exception is thrown.
+     * 
+     * @throws Exception If the config file does not exist, has invalid/missing variables,
+     *                   or if there are other errors during initialization.
+     * 
+     * @return View The view to be rendered after successful initialization.
+     * 
+     */
     public function init()
     {
         try {
@@ -57,9 +80,29 @@ class Main extends BaseController
 
         // if everything is ok, set config variables in session
         session()->set($config);
-        dd(session()->get());
+
+        // get restaurant details
+        $this->_get_restaurant_details();
+
+        // if everything is ok, show success page
+        $this->_init_success();
     }
 
+    /**
+     * Displays an error message in the view and terminates the application.
+     * 
+     * This function is responsible for displaying error messages in the view and
+     * terminating the application's execution. If a specific error message is provided
+     * as an argument, it will be displayed. Otherwise, it attempts to retrieve an error
+     * message from the session flash data. If no error message is found, a generic
+     * "System error" message is displayed, prompting the user to contact support.
+     * 
+     * @param string|null $message An optional error message to be displayed. If not provided,
+     *                              the function attempts to retrieve an error message from the
+     *                              session flash data.
+     * 
+     * @return View The view containing the error message.
+     */
     public function init_error($message = null)
     {
         if (empty($message)) {
@@ -67,7 +110,7 @@ class Main extends BaseController
         }
 
         if (empty($message)) {
-            die('Unknown error');
+            die('System error: Please contact the support');
         }
 
         echo view('errors/init_error', [
@@ -76,18 +119,142 @@ class Main extends BaseController
         die;
     }
 
+    /**
+     * Stops the application by destroying the session and displaying an error message.
+     * 
+     * This function terminates the application's execution by destroying the session,
+     * effectively resetting the application's configuration. It then displays an error
+     * message indicating that the application configuration has been reset.
+     * 
+     * @return View The view containing the error message.
+     */
     public function stop()
     {
         session()->destroy();
         $this->init_error('Application configuration has been reseted');
     }
 
-    public function index()
-    {
-        // teste api
-        $api = new ApiModel();
+    // -----------------------------------------------------------------------------------------------------------------
+    // PRIVATE FUNCTIONS
+    // -----------------------------------------------------------------------------------------------------------------
 
-        echo '<pre>';
-        print_r($api->get_status());
+    /**
+     * Retrieves restaurant details from the CigBurger API and sets them in the session.
+     * 
+     * This function loads initial data by fetching restaurant details from theCigBurger
+     * API using an instance of the ApiModel class. It then checks the retrieved data
+     * to ensure it is valid. If the data is invalid, it displays an error message
+     * and terminates the application. Otherwise, it sets the retrieved data in the
+     * session for later use.
+     * 
+     * @return void
+     */
+    private function _get_restaurant_details()
+    {
+        // load initial data
+        $api = new ApiModel();
+        $data = $api->get_restaurant_details();
+
+        if (!$this->_check_data($data)) {
+            $this->init_error('System error: Please contact the support');
+        }
+
+        // set initial data in session
+        $restaurant_data = [
+            'restaurant_details' => $data['data']['restaurant_details'],
+            'products_categories' => $data['data']['products_categories'],
+            'products' => $data['data']['products'],
+        ];
+        session()->set($restaurant_data);
+    }
+
+    /**
+     * Checks the validity of retrieved data from an API.
+     * 
+     * This function verifies whether the retrieved data from an API is valid. It checks
+     * if the data is not empty, is an array, contains required keys ('status' and 'message'),
+     * and if the 'status' is 200 and the 'message' is 'success'. If any of these conditions
+     * are not met, the function returns false indicating invalid data; otherwise, it returns true.
+     * 
+     * @param array $data The data retrieved from the API.
+     * 
+     * @return bool True if the data is valid; otherwise, false.
+     */
+    private function _check_data($data)
+    {
+        if (
+            empty($data)
+            || !is_array($data)
+            || !key_exists('status', $data)
+            || !key_exists('message', $data)
+            || $data['status'] !== 200
+            || $data['message'] !== 'success'
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Initializes the touch screen interface with product information.
+     * 
+     * This method retrieves product information, including categories and available stock, 
+     * to initialize the touch screen interface for users to make purchases at the restaurant.
+     * It prepares the necessary data and renders the view for the touch screen interface.
+     * 
+     * @return View The view for the touch screen interface with product information.
+     */
+    private function _init_success()
+    {
+        // prepare data
+        $data = [
+            'initiated_at' => date('Y-m-d H:i:s'),
+            'restaurant_id' => session()->get('restaurant_details')['project_id'],
+            'restaurant_name' => session()->get('restaurant_details')['name'],
+            'categories' => $this->_get_restaurant_categories(),
+            'products' => $this->_get_restaurant_products_and_stock()
+        ];
+
+        echo view('init_success', $data);
+        die;
+    }
+
+    /**
+     * Retrieves restaurant categories from session data.
+     * 
+     * This method extracts restaurant categories from session data and returns them as an array.
+     * 
+     * @return array The array of restaurant categories.
+     */
+    private function _get_restaurant_categories()
+    {
+        $categories = [];
+        foreach (session()->get('products_categories') as $category) {
+            $categories[] = $category['category'];
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Retrieves product information with available stock from session data.
+     * 
+     * This method extracts product information including product image, name, and available stock 
+     * from session data and returns it as an array.
+     * 
+     * @return array The array of product information with available stock.
+     */
+    private function _get_restaurant_products_and_stock()
+    {
+        $products = [];
+        foreach (session()->get('products') as $product) {
+            $products[] = [
+                'image' => $product['image'],
+                'product' => $product['name'],
+                'stock' => $product['stock']
+            ];
+        }
+
+        return $products;
     }
 }
