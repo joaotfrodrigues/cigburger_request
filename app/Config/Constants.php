@@ -92,3 +92,10 @@ define('EVENT_PRIORITY_NORMAL', 100);
  * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_HIGH instead.
  */
 define('EVENT_PRIORITY_HIGH', 10);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// CUSTOM CONSTANTS
+// ---------------------------------------------------------------------------------------------------------------------
+
+// ENCRYPTION KEY
+define('ENCRYPTION_KEY', 'pQa50gITVuVZpFXDRXrB7xzhXIrx3LLU');
