@@ -11,6 +11,9 @@
 
     <!-- fontawesome -->
     <link rel="stylesheet" href="<?= base_url('assets/fontawesome/all.min.css') ?>">
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/main.css') ?>">
 </head>
 
 <body>

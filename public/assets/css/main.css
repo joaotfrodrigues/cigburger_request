@@ -1,0 +1,16 @@
+.cig-primary {
+    text-decoration: none;
+    background: transparent;
+    border: 2px solid #aaa;
+    border-radius: 50px;
+    color: #000;
+    text-align: center;
+    margin: 3px;
+    padding: 10px 30px;
+}
+
+.cig-primary:hover {
+    background-color: #ff730020;
+    border: 2px solid #ff7300;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
