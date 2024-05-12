@@ -97,5 +97,8 @@ define('EVENT_PRIORITY_HIGH', 10);
 // CUSTOM CONSTANTS
 // ---------------------------------------------------------------------------------------------------------------------
 
+// app name
+define('APP_NAME', 'CIG REQUEST');
+
 // ENCRYPTION KEY
 define('ENCRYPTION_KEY', 'pQa50gITVuVZpFXDRXrB7xzhXIrx3LLU');

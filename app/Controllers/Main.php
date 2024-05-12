@@ -14,54 +14,72 @@ class Main extends BaseController
         try {
             // check if config file exists
             if (!file_exists(ROOTPATH . 'config.json')) {
-                $this->_init_error('Config file not found');
+                $this->init_error('Config file not found');
             }
 
             // load config file
             $config = json_decode(file_get_contents(ROOTPATH . 'config.json'), true);
 
             if (empty($config)) {
-                $this->_init_error('There was an error loading the config file');
+                $this->init_error('There was an error loading the config file');
             }
 
             // check if config file is valid
             if (!key_exists('api_url', $config)) {
-                $this->_init_error('Config file is not valid: api_url is missing');
+                $this->init_error('Config file is not valid: api_url is missing');
             }
 
             if (!key_exists('project_id', $config)) {
-                $this->_init_error('Config file is not valid: project_id is missing');
+                $this->init_error('Config file is not valid: project_id is missing');
             }
 
             if (!key_exists('api_key', $config)) {
-                $this->_init_error('Config file is not valid: api_key is missing');
+                $this->init_error('Config file is not valid: api_key is missing');
             }
 
             // check if api url is valid
             if (!filter_var($config['api_url'], FILTER_VALIDATE_URL)) {
-                $this->_init_error('Config file is not valid: api_url is not a valid url');
+                $this->init_error('Config file is not valid: api_url is not a valid url');
             }
 
             // check if project id is valid
             if (!is_numeric($config['project_id'])) {
-                $this->_init_error('Config file is not valid: project_id is not a valid number');
+                $this->init_error('Config file is not valid: project_id is not a valid number');
             }
 
             // check if api key is valid
             if (!preg_match('/^[a-zA-Z0-9]{32}$/', $config['api_key'])) {
-                $this->_init_error('Config file is not valid: api_key is not a valid key');
+                $this->init_error('Config file is not valid: api_key is not a valid key');
             }
         } catch (\Exception $e) {
-            $this->_init_error('The was an error loading the config file');
+            $this->init_error('The was an error loading the config file');
         }
 
         // if everything is ok, set config variables in session
         session()->set($config);
+        dd(session()->get());
     }
 
-    private function _init_error($message)
+    public function init_error($message = null)
     {
-        die($message);
+        if (empty($message)) {
+            $message = session()->getFlashdata('error');
+        }
+
+        if (empty($message)) {
+            die('Unknown error');
+        }
+
+        echo view('errors/init_error', [
+            'error' => $message
+        ]);
+        die;
+    }
+
+    public function stop()
+    {
+        session()->destroy();
+        $this->init_error('Application configuration has been reseted');
     }
 
     public function index()
