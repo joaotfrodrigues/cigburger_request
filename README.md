@@ -1,4 +1,4 @@
-# CigBurger Backoffice Project
+# CigBurger Request Project
 
 ## ❓ What is this?
 
