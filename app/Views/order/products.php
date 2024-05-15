@@ -2,9 +2,9 @@
     <div class="container-fluid">
         <div class="row">
             <?php foreach ($products as $product) : ?>
-                <div class="col-4 text-center">
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                     <a href="#" class="no-link">
-                        <div class="order-product">
+                        <div class="order-product text-center">
                             <img src="<?= API_IMAGES_URL . $product['image'] ?>" alt="<?= $product['image'] ?>" class="img-fluid" width="160">
                             <p class="order-product-title"><?= $product['name'] ?></p>
                             <div class="d-flex justify-content-center align-items-center">

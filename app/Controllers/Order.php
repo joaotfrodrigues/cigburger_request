@@ -20,7 +20,6 @@ class Order extends BaseController
 
         // gets the products by category
         $selected_category = session()->get('selected_category');
-        session()->remove('selected_category');
         if (empty($selected_category)) {
             $selected_category = 'Todos';
         }
@@ -46,6 +45,20 @@ class Order extends BaseController
         session()->set('selected_category', Decrypt($category));
 
         return redirect()->to('/order');
+    }
+
+    public function cancel()
+    {
+        // clear order
+        delete_order();
+
+        echo 'confirmar cancelamento do pedido';
+    }
+
+    public function checkout()
+    {
+        // show checkout page
+        dd(get_order());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
