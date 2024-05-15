@@ -10,11 +10,11 @@ class Main extends BaseController
 {
     public function index()
     {
-        // teste api
-        $api = new ApiModel();
+        // clear any previous order from customer
+        session()->remove('customer_order');
 
-        echo '<pre>';
-        print_r($api->get_status());
+        // display new order page
+        echo view('main');
     }
 
     /**

@@ -14,6 +14,8 @@
 
     <!-- custom css -->
     <link rel="stylesheet" href="<?= base_url('assets/css/main.css') ?>">
+
+    <link rel="shortcut icon" href="<?= base_url('assets/images/logo.png') ?>" type="image/png">
 </head>
 
 <body>
@@ -24,6 +26,11 @@
 
     <!-- content -->
     <?= $this->renderSection('content') ?>
+
+    <!-- footer -->
+    <footer class="my-5 text-center text-muted">
+        <i class="fa-solid fa-burger me-2"></i>Cigburger &copy; <?= date('Y') ?>
+    </footer>
 
     <!-- bootstrap -->
     <script src="<?= base_url('assets/bootstrap/bootstrap.bundle.min.js') ?>"></script>
