@@ -7,6 +7,17 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class Order extends BaseController
 {
+    /**
+     * Displays the main order page with product categories and products.
+     * 
+     * This function prepares the data required to display the main order page, 
+     * including product categories and products filtered by the selected category. 
+     * It retrieves product categories from the session, adds an "All Products" category, 
+     * gets the products for the selected category, calculates additional product 
+     * information (such as discounts), and then renders the order page with this data.
+     * 
+     * @return View The rendered view of the main order page.
+     */
     public function index()
     {
         // prepare data
@@ -34,6 +45,17 @@ class Order extends BaseController
         return view('order/main_page', $data);
     }
 
+    /**
+     * Sets the selected product category filter and redirects to the order page.
+     * 
+     * This function decrypts the provided category parameter and checks its validity. 
+     * If the category is invalid or empty, it redirects to the order page. If valid, 
+     * it sets the selected category in the session and then redirects to the order page.
+     * 
+     * @param string|null $category The encrypted category name.
+     * 
+     * @return \CodeIgniter\HTTP\RedirectResponse Redirects to the order page.
+     */
     public function set_filter($category = null)
     {
         // check if $category is encrypted correctly
@@ -49,10 +71,9 @@ class Order extends BaseController
 
     public function cancel()
     {
-        // clear order
-        delete_order();
-
-        echo 'confirmar cancelamento do pedido';
+        // temp
+        echo 'confirmar cancelamento do pedido<br>';
+        echo '<a href="' . site_url('/order') . '">Não</a><br><a href="' . site_url('/') . '">Sim</a>';
     }
 
     public function checkout()
@@ -64,6 +85,18 @@ class Order extends BaseController
     // -----------------------------------------------------------------------------------------------------------------
     // PRIVATE METHODS
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Retrieves products filtered by the specified category.
+     * 
+     * This function fetches all products from the session and filters them based on 
+     * the provided category. If the category is 'Todos', it returns all products. 
+     * Otherwise, it returns only the products that match the specified category.
+     * 
+     * @param string $category The category to filter products by.
+     * 
+     * @return array The list of products filtered by the specified category.
+     */
     private function _get_products_by_category($category)
     {
         // get all products
@@ -85,6 +118,19 @@ class Order extends BaseController
         return $products_by_category;
     }
 
+    /**
+     * Processes and enhances product information with additional details.
+     * 
+     * This function iterates over a list of products, checks their availability,
+     * applies promotions if applicable, and determines stock availability. It
+     * enriches each product with additional information such as promotion status,
+     * old price, and stock status. Only valid and available products are included
+     * in the final list.
+     * 
+     * @param array $products The list of products to process.
+     * 
+     * @return array The list of processed and valid products.
+     */
     public function _set_products_info($products)
     {
         $valid_products = [];

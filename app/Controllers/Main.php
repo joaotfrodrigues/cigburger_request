@@ -8,81 +8,45 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class Main extends BaseController
 {
+    /**
+     * Handles the initial setup and display of the new order page.
+     * 
+     * This function resets any previous order by calling `init_order`, updates session 
+     * information about the restaurant if it's not already set, and then displays the 
+     * new order page.
+     * 
+     * @return void
+     */
     public function index()
     {
-        // clear any previous order from customer
-        session()->remove('customer_order');
+        // reset any previous order and set a new one
+        init_order();
+
+        // update session information about the restaurant
+        if (empty(session()->getFlashdata('system_initiated'))) {
+            $this->_init_system();
+        }
 
         // display new order page
         echo view('main');
     }
 
     /**
-     * Initialize the application by loading configuration settings, validating them,
-     * and preparing the application for use.
+     * Initializes the system by loading restaurant details and setting a session flag.
      * 
-     * This function loads configuration settings from a JSON file, validates
-     * those settings to ensure they are complete and in the correct format, and then
-     * prepares the application for use based on the configuration. If any errors
-     * occur during the initialization process, an exception is thrown.
+     * This function calls `_init_system` to load restaurant details, sets a flag in the 
+     * session indicating that the system was initiated, and then displays a success page 
+     * if everything is correct.
      * 
-     * @throws Exception If the config file does not exist, has invalid/missing variables,
-     *                   or if there are other errors during initialization.
-     * 
-     * @return View The view to be rendered after successful initialization.
-     * 
+     * @return void
      */
     public function init()
     {
-        try {
-            // check if config file exists
-            if (!file_exists(ROOTPATH . 'config.json')) {
-                $this->init_error('Config file not found');
-            }
-
-            // load config file
-            $config = json_decode(file_get_contents(ROOTPATH . 'config.json'), true);
-
-            if (empty($config)) {
-                $this->init_error('There was an error loading the config file');
-            }
-
-            // check if config file is valid
-            if (!key_exists('api_url', $config)) {
-                $this->init_error('Config file is not valid: api_url is missing');
-            }
-
-            if (!key_exists('project_id', $config)) {
-                $this->init_error('Config file is not valid: project_id is missing');
-            }
-
-            if (!key_exists('api_key', $config)) {
-                $this->init_error('Config file is not valid: api_key is missing');
-            }
-
-            // check if api url is valid
-            if (!filter_var($config['api_url'], FILTER_VALIDATE_URL)) {
-                $this->init_error('Config file is not valid: api_url is not a valid url');
-            }
-
-            // check if project id is valid
-            if (!is_numeric($config['project_id'])) {
-                $this->init_error('Config file is not valid: project_id is not a valid number');
-            }
-
-            // check if api key is valid
-            if (!preg_match('/^[a-zA-Z0-9]{32}$/', $config['api_key'])) {
-                $this->init_error('Config file is not valid: api_key is not a valid key');
-            }
-        } catch (\Exception $e) {
-            $this->init_error('The was an error loading the config file');
-        }
-
-        // if everything is ok, set config variables in session
-        session()->set($config);
-
         // get restaurant details
-        $this->_get_restaurant_details();
+        $this->_init_system();
+
+        // sets a flag in session, indicating that the system was initiated
+        session()->setFlashdata('system_initiated', true);
 
         // if everything is ok, show success page
         $this->_init_success();
@@ -135,8 +99,76 @@ class Main extends BaseController
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    // PRIVATE FUNCTIONS
+    // PRIVATE METHODS
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Initialize the application by loading configuration settings, validating them,
+     * and preparing the application for use.
+     * 
+     * This function loads configuration settings from a JSON file, validates
+     * those settings to ensure they are complete and in the correct format, and then
+     * prepares the application for use based on the configuration. If any errors
+     * occur during the initialization process, an exception is thrown.
+     * 
+     * @throws Exception If the config file does not exist, has invalid/missing variables,
+     *                   or if there are other errors during initialization.
+     * 
+     * @return void
+     * 
+     */
+    private function _init_system()
+    {
+        try {
+            // check if config file exists
+            if (!file_exists(ROOTPATH . 'config.json')) {
+                $this->init_error('Config file not found');
+            }
+
+            // load config file
+            $config = json_decode(file_get_contents(ROOTPATH . 'config.json'), true);
+
+            if (empty($config)) {
+                $this->init_error('There was an error loading the config file');
+            }
+
+            // check if config file is valid
+            if (!key_exists('api_url', $config)) {
+                $this->init_error('Config file is not valid: api_url is missing');
+            }
+
+            if (!key_exists('project_id', $config)) {
+                $this->init_error('Config file is not valid: project_id is missing');
+            }
+
+            if (!key_exists('api_key', $config)) {
+                $this->init_error('Config file is not valid: api_key is missing');
+            }
+
+            // check if api url is valid
+            if (!filter_var($config['api_url'], FILTER_VALIDATE_URL)) {
+                $this->init_error('Config file is not valid: api_url is not a valid url');
+            }
+
+            // check if project id is valid
+            if (!is_numeric($config['project_id'])) {
+                $this->init_error('Config file is not valid: project_id is not a valid number');
+            }
+
+            // check if api key is valid
+            if (!preg_match('/^[a-zA-Z0-9]{32}$/', $config['api_key'])) {
+                $this->init_error('Config file is not valid: api_key is not a valid key');
+            }
+        } catch (\Exception $e) {
+            $this->init_error('The was an error loading the config file');
+        }
+
+        // if everything is ok, set config variables in session
+        session()->set($config);
+
+        // get restaurant details
+        $this->_get_restaurant_details();
+    }
 
     /**
      * Retrieves restaurant details from the CigBurger API and sets them in the session.
