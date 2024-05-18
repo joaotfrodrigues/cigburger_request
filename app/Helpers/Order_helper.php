@@ -77,3 +77,77 @@ if (!function_exists('get_total_order_items')) {
         return $total;
     }
 }
+
+if (!function_exists('get_order_product_quantity')) {
+    /**
+     * Retrieves the quantity of a product in the current order.
+     * 
+     * This function fetches the current order from the session and checks if the product with the specified ID
+     * exists in the order items. If the product exists, it returns the quantity of that product in the order.
+     * If the product does not exist in the order or if the order is empty, it returns 0.
+     * 
+     * @param int $id The ID of the product to retrieve the quantity for.
+     * 
+     * @return int The quantity of the specified product in the current order, or 0 if not found.
+     */
+    function get_order_product_quantity($id)
+    {
+        $order = get_order();
+
+        if (empty($order['items'])) {
+            return 0;
+        }
+
+        if (key_exists($id, $order['items'])) {
+            return $order['items'][$id]['quantity'];
+        }
+
+        return 0;
+    }
+}
+
+if (!function_exists('update_order')) {
+    /**
+     * Updates the order with the specified product ID, quantity, and price.
+     * 
+     * This function retrieves the current order from the session and updates it based on the provided
+     * product ID, quantity, and price. If the product already exists in the order, it updates the quantity
+     * of the product. If the quantity is 0, it removes the product from the order. If the product is not
+     * already in the order and the quantity is greater than 0, it adds the new product with the specified 
+     * quantity and price. Finally, it updates the order in the session with the modified order data.
+     * 
+     * @param int $product_id The ID of the product to update in the order.
+     * @param int $quantity The new quantity of the product.
+     * @param float $price The price of the product.
+     * 
+     * @return void
+     */
+    function update_order($product_id, $quantity, $price)
+    {
+        // get order from session
+        $order = get_order();
+
+        // check if product already exists in the order
+        if (key_exists($product_id, $order['items'])) {
+            if ($quantity == 0) {
+                // remove product from order
+                unset($order['items'][$id]);
+            } else {
+                // update product quantity
+                $order['items'][$product_id]['quantity'] = $quantity;
+            }
+        } else {
+            // check if quantity is 0
+            if (quantity === 0) return;
+
+            // add new product to the order
+            $order['items'][$product_id] = [
+                'quantity' => $quantity,
+                'price' => $price
+            ];
+        }
+
+        // update order in session
+        session()->set('order', $order);
+    }
+}

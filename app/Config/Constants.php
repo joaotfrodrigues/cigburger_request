@@ -105,3 +105,6 @@ define('ENCRYPTION_KEY', 'pQa50gITVuVZpFXDRXrB7xzhXIrx3LLU');
 
 // IMAGES FROM API URL
 define('API_IMAGES_URL', 'http://localhost/cigburger_backoffice/public/assets/images/products/');
+
+// MAX QUANTITY OF EACH PRODUCT IN THE ORDER
+define('MAX_QUANTITY_PER_PRODUCT', 20);

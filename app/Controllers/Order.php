@@ -54,7 +54,7 @@ class Order extends BaseController
      * 
      * @param string|null $category The encrypted category name.
      * 
-     * @return \CodeIgniter\HTTP\RedirectResponse Redirects to the order page.
+     * @return RedirectResponse Redirects to the order page.
      */
     public function set_filter($category = null)
     {
@@ -65,6 +65,84 @@ class Order extends BaseController
 
         // set selected category
         session()->set('selected_category', Decrypt($category));
+
+        return redirect()->to('/order');
+    }
+
+    /**
+     * Displays the add product view with product details for the client to choose quantity and see more information.
+     * 
+     * This function decrypts the provided encrypted product ID and validates it. If the ID is invalid,
+     * it redirects to the order page. It then retrieves the product by its ID and checks if the product
+     * exists. If the product does not exist, it redirects to the order page. If the product exists, it
+     * checks for any promotions on the product, retrieves the quantity of the product in the current order,
+     * and then displays the add product page with the product details, allowing the client to choose the quantity
+     * and add it to the shopping cart.
+     * 
+     * @param string $enc_id The encrypted ID of the product to display.
+     * 
+     * @return View The rendered view of the add product
+     */
+    public function add_product($enc_id)
+    {
+        // check if product id is valid
+        $id = Decrypt($enc_id);
+        if (empty($id)) {
+            return redirect()->to('/order');
+        }
+
+        // get product by id
+        $product = $this->_get_product_by_id($id);
+
+        if (empty($product)) {
+            return redirect()->to('/order');
+        }
+
+        // check if product have a promotion
+        $this->_check_product_promotion($product);
+
+        // check if product is already in the order, and get the quantity
+        $quantity = get_order_product_quantity($id);
+
+        // display add product view
+        return view('order/add_product', [
+            'product' => $product,
+            'quantity' => $quantity
+        ]);
+    }
+
+    /**
+     * Confirms and adds a product to the order with the specified quantity.
+     * 
+     * This function decrypts the provided encrypted product ID and validates it. If the ID is invalid,
+     * it redirects to the order page. It also validates the quantity to ensure it falls within the allowed range.
+     * It then retrieves the product details by its ID, checks for any promotions on the product, and updates
+     * the order with the specified quantity and product price. Finally, it redirects back to the order page.
+     * 
+     * @param string $enc_id The encrypted ID of the product to add to the order.
+     * @param int $quantity The quantity of the product to add to the order.
+     * 
+     * @return RedirectResponse Redirects to the order page after adding the product to the order.
+     */
+    public function add_product_confirm($enc_id, $quantity)
+    {
+        // check if id and quantity are valid
+        $id = Decrypt($enc_id);
+        if (empty($id)) {
+            return redirect()->to('/order');
+        }
+
+        // check if quantity is valid
+        if ($quantity < 0 || $quantity > MAX_QUANTITY_PER_PRODUCT) {
+            return redirect()->to('/order');
+        }
+
+        // get the price of the product
+        $product = $this->_get_product_by_id($id);
+        $this->_check_product_promotion($product);
+
+        // update the order
+        update_order($id, $quantity, $product['price']);
 
         return redirect()->to('/order');
     }
@@ -146,7 +224,7 @@ class Order extends BaseController
      * 
      * @return array The list of processed and valid products.
      */
-    public function _set_products_info($products)
+    private function _set_products_info($products)
     {
         $valid_products = [];
         foreach ($products as $index => $product) {
@@ -155,26 +233,85 @@ class Order extends BaseController
                 continue;
             }
 
-            // promotion
-            if ($product['promotion'] > 0) {
-                $product['has_promotion'] = true;
-                $product['old_price'] = $product['price'];
-                $product['price'] = $product['price'] - ($product['price'] * $product['promotion'] / 100);
-            } else {
-                $product['has_promotion'] = false;
-                $product['old_price'] = 0.0;
-            }
+            // promotion ?
+            $this->_check_product_promotion($product);
 
             // stock availability
-            if ($product['stock'] <= $product['stock_min_limit']) {
-                $product['out_of_stock'] = true;
-            } else {
-                $product['out_of_stock'] = false;
-            }
+            $this->_check_product_availability($product);
 
             $valid_products[] = $product;
         }
 
         return $valid_products;
+    }
+
+    /**
+     * Checks and applies promotion details to a product.
+     * 
+     * This function checks if the given product has a promotion. If a promotion exists,
+     * it sets the `has_promotion` flag to true, calculates and sets the discounted price,
+     * and records the old price. If no promotion exists, it sets the `has_promotion` flag
+     * to false and the `old_price` to 0.0.
+     * 
+     * @param array &$product The product array to check and modify for promotion details.
+     * 
+     * @return void
+     */
+    private function _check_product_promotion(&$product)
+    {
+        if ($product['promotion'] > 0) {
+            $product['has_promotion'] = true;
+            $product['old_price'] = $product['price'];
+            $product['price'] = $product['price'] - ($product['price'] * $product['promotion'] / 100);
+        } else {
+            $product['has_promotion'] = false;
+            $product['old_price'] = 0.0;
+        }
+    }
+
+    /**
+     * Checks and updates the availability status of a product based on its stock levels.
+     * 
+     * This function examines the stock level of the given product and updates its availability status.
+     * If the stock is less than or equal to the minimum stock limit, it sets the `out_of_stock` flag to true.
+     * Otherwise, it sets the `out_of_stock` flag to false.
+     * 
+     * @param array &$product The product array to check and modify for availability status.
+     * 
+     * @return void
+     */
+    private function _check_product_availability(&$product)
+    {
+        if ($product['stock'] <= $product['stock_min_limit']) {
+            $product['out_of_stock'] = true;
+        } else {
+            $product['out_of_stock'] = false;
+        }
+    }
+
+    /**
+     * Retrieves a product by its ID.
+     * 
+     * This function fetches all products from the session and searches for a product with the specified ID.
+     * If a product with the matching ID is found, it returns that product. If no matching product is found,
+     * it returns null.
+     * 
+     * @param int $id The ID of the product to retrieve.
+     * 
+     * @return array|null The product with the specified ID, or null if not found.
+     */
+    private function _get_product_by_id($id)
+    {
+        // get all products
+        $products = session()->get('products');
+
+        // get product by id
+        foreach ($products as $product) {
+            if ($product['id'] === $id) {
+                return $product;
+            }
+        }
+
+        return null;
     }
 }

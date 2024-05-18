@@ -50,7 +50,7 @@
     justify-content: center;
 }
 
-/* order */not-linkable
+/* order */
 .no-link {
     text-decoration: none;
 }
@@ -77,9 +77,30 @@
 }
 
 .order-product-title {
-    color: rgba(255, 127, 68);
+    color: rgb(255, 127, 68);
     font-size: 24px;
     font-weight: bold;
+}
+
+.order-product-title-large {
+    color: rgb(255, 127, 68);
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.order-product-description {
+    color: rgb(100, 100, 100);
+    font-size: 22px;
+    padding: 0;
+    margin: 0;
+}
+
+.order-product-quantity {
+    color: rgb(255, 102, 0);
+    font-size: 46px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
 }
 
 .order-product-price {
