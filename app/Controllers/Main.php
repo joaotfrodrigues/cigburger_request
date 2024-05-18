@@ -15,7 +15,7 @@ class Main extends BaseController
      * information about the restaurant if it's not already set, and then displays the 
      * new order page.
      * 
-     * @return void
+     * @return View The view containing the new order page 
      */
     public function index()
     {
@@ -28,7 +28,7 @@ class Main extends BaseController
         }
 
         // display new order page
-        echo view('main');
+        return view('main');
     }
 
     /**

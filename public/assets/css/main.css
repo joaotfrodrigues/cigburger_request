@@ -50,9 +50,17 @@
     justify-content: center;
 }
 
-/* order */
+/* order */not-linkable
 .no-link {
     text-decoration: none;
+}
+
+.order-product-not-linkable {
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
+    cursor: not-allowed;
 }
 
 .order-product {

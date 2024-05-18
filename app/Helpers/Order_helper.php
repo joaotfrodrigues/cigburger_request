@@ -54,3 +54,26 @@ if (!function_exists('get_order')) {
         return session()->get('order');
     }
 }
+
+if (!function_exists('get_total_order_items')) {
+    /**
+     * Calculates the total number of items in the current order.
+     * 
+     * This function retrieves the current order from the session and sums the quantities 
+     * of all items in the order. It returns the total number of items.
+     * 
+     * @return int The total quantity of items in the current order.
+     */
+    function get_total_order_items()
+    {
+        // get order from session
+        $order = get_order();
+
+        $total = 0;
+        foreach ($order['items'] as $item) {
+            $total += $item['quantity'];
+        }
+
+        return $total;
+    }
+}

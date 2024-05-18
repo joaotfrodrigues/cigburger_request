@@ -69,11 +69,26 @@ class Order extends BaseController
         return redirect()->to('/order');
     }
 
+    /**
+     * Handles the cancellation process by checking the current order and displaying a confirmation view.
+     * 
+     * This function checks if there is an existing order with at least one item. If no items are found 
+     * in the order, it redirects to the home page. Otherwise, it displays a cancellation confirmation page.
+     * 
+     * @return View The rendered view of the cancellation confirmation page.
+     */
     public function cancel()
     {
-        // temp
-        echo 'confirmar cancelamento do pedido<br>';
-        echo '<a href="' . site_url('/order') . '">Não</a><br><a href="' . site_url('/') . '">Sim</a>';
+        // check if there is an order with, at least, one item
+        $order = get_order();
+        if (empty($order['items'])) {
+            return redirect()->to('/');
+        }
+
+        // show cancel confirmation page
+        return view('order/cancel_confirmation', [
+            'total_items' => get_total_order_items()
+        ]);
     }
 
     public function checkout()

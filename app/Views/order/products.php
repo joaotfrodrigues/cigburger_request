@@ -3,8 +3,15 @@
         <div class="row">
             <?php foreach ($products as $product) : ?>
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                    <a href="#" class="no-link">
-                        <div class="order-product text-center">
+
+                    <?php 
+                        $linkable = $product['out_of_stock'] ? false : true;
+                    ?>
+
+                    <?php if ($linkable): ?>
+                        <a href="#" class="no-link">
+                    <?php endif; ?>
+                        <div class="text-center order-product<?= $linkable ? '' : '-not-linkable' ?>">
                             <img src="<?= API_IMAGES_URL . $product['image'] ?>" alt="<?= $product['image'] ?>" class="img-fluid" width="160">
                             <p class="order-product-title"><?= $product['name'] ?></p>
                             <div class="d-flex justify-content-center align-items-center">
@@ -21,7 +28,9 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </a>
+                    <?php if ($linkable): ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
