@@ -82,12 +82,12 @@ class Order extends BaseController
      * it redirects to the order page. It then retrieves the product by its ID and checks if the product
      * exists. If the product does not exist, it redirects to the order page. If the product exists, it
      * checks for any promotions on the product, retrieves the quantity of the product in the current order,
-     * and then displays the add product page with the product details, allowing the client to choose the quantity
-     * and add it to the shopping cart.
+     * and sets the quantity to 1 if the product does not already exist in the order. It then displays the 
+     * add product page with the product details, allowing the client to choose the quantity and add it to the shopping cart.
      * 
      * @param string $enc_id The encrypted ID of the product to display.
      * 
-     * @return View The rendered view of the add product
+     * @return View The rendered view of the add product page.
      */
     public function add_product($enc_id)
     {
@@ -109,6 +109,11 @@ class Order extends BaseController
 
         // check if product is already in the order, and get the quantity
         $quantity = get_order_product_quantity($id);
+
+        // if the product does not exists in the order, set quantity to 1
+        if (empty($quantity)) {
+            $quantity = 1;
+        }
 
         // display add product view
         return view('order/add_product', [
@@ -151,6 +156,31 @@ class Order extends BaseController
         update_order($id, $quantity, $product['price']);
 
         return redirect()->to('/order');
+    }
+
+    /**
+     * Removes a product from the order.
+     * 
+     * This function decrypts the provided encrypted product ID and validates it. If the ID is invalid,
+     * it redirects to the order page. It then removes the product from the order by setting its quantity
+     * to zero and updates the order in the session. Finally, it redirects to the checkout page.
+     * 
+     * @param string $enc_id The encrypted ID of the product to remove from the order.
+     * 
+     * @return RedirectResponse Redirects to the checkout page after removing the product.
+     */
+    public function remove_product($enc_id)
+    {
+        // check if id is valid
+        $id = Decrypt($enc_id);
+        if (empty($id)) {
+            return redirect()->to('/order');
+        }
+
+        // remove product from order
+        update_order($id, 0, 0.0);
+
+        return redirect()->to('/order/checkout');
     }
 
     /**
@@ -214,6 +244,93 @@ class Order extends BaseController
 
         // display checkout page
         return view('order/order_checkout', $data);
+    }
+
+    /**
+     * Displays the checkout payment page with order details.
+     * 
+     * This function retrieves the current order from the session and prepares the data needed to display
+     * the checkout payment page. It calculates the total number of products and the total price of the order.
+     * For each product in the order, it retrieves the product details, adds additional details such as quantity
+     * and total price (considering any promotions), and compiles this information into a list of order products.
+     * The function then renders the checkout payment page with this data.
+     * 
+     * @return View The rendered view of the checkout payment page.
+     */
+
+    public function checkout_payment()
+    {
+        // get the order
+        $order = get_order();
+
+        // prepare data to display
+        $data['total_products'] = get_total_order_items();
+        $data['total_price'] = get_total_order_price();
+
+        $order_products = [];
+        foreach ($order['items'] as $id => $item) {
+            // get product details
+            $product = $this->_get_product_by_id($id);
+
+            // addicional product details based on the order
+            $product['quantity'] = $item['quantity'];
+            // total price of the order ( check for promotion )
+            $this->_check_product_promotion($product);
+            $product['total_price'] = $item['quantity'] * $item['price'];
+
+            // add product to the list
+            $order_products[] = $product;
+        }
+
+        $data['order_products'] = $order_products;
+
+        // display checkout payment page
+        return view('order/order_checkout_payment', $data);
+    }
+
+    /**
+     * Displays the checkout payment process page with the total order price.
+     * 
+     * This function retrieves the total price of the current order from the session and prepares the data
+     * needed to display the checkout payment process page. It simulates the payment process by displaying
+     * a page with the total order price and a fake PIN number for demonstration purposes. Additionally,
+     * it checks if there was any error message in the session and includes it in the data to be displayed.
+     * 
+     * @return View The rendered view of the checkout payment process page.
+     */
+    public function checkout_payment_process()
+    {
+        // get total order price
+        $data['total_price'] = get_total_order_price();
+
+        // fake pin number
+        $data['pin_number'] = rand(1000, 9999);
+
+        // check if there was an error
+        $data['error'] = session()->getFlashdata('error');
+
+        // display checkout payment page, checkout simulation
+        return view('order/checkout_payment_process', $data);
+    }
+
+    public function checkout_payment_confirm()
+    {
+        // get pin value
+        $pin_value = Decrypt($this->request->getPost('pin_value'));
+
+        // validate pin value
+        if (empty($pin_value)) {
+            return redirect()->back()->with('error', 'Aconteceu um erro com o PIN. Tente novamente');
+        }
+
+        // validate pin number
+        $pin_number = $this->request->getPost('pin_number');
+        if (empty($pin_number) || !preg_match('/^\d{4}$/', $pin_number) || $pin_number != $pin_value) {
+            return redirect()->back()->with('error', 'O PIN introduzido não é válido.');
+        }
+
+        echo 'Vamos confirmar o pedido';
+        die;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
