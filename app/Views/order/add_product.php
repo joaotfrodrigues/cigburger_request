@@ -4,13 +4,13 @@
     <div class="row justify-content-center">
         <div class="col-10 card p-5">
             <div class="row">
-                <div class="col-md-6 col-12 text-center p-3">
+                <div class="col-lg-6 col-12 text-center p-3">
                     <img src="<?= API_IMAGES_URL . $product['image'] ?>" alt="<?= $product['image'] ?>">
                     <p class="order-product-title-large"><?= $product['name'] ?></p>
                     <p class="order-product-description"><?= $product['description'] ?></p>
                 </div>
 
-                <div class="col-md-6 col-12 text-center">
+                <div class="col-lg-6 col-12 text-center">
                     <div class="d-flex justify-content-center align-items-center border rounded-5 bg-light p-4 gap-2">
                         <?php if($product['has_promotion']): ?>
                             <span class="order-product-old-price"><?= format_currency($product['old_price']) ?></span>

@@ -15,6 +15,8 @@ class Order extends BaseController
      * It retrieves product categories from the session, adds an "All Products" category, 
      * gets the products for the selected category, calculates additional product 
      * information (such as discounts), and then renders the order page with this data.
+     * It also retrieves the total number of items in the current order and the total 
+     * price of the order to be displayed on the main order page.
      * 
      * @return View The rendered view of the main order page.
      */
@@ -41,6 +43,10 @@ class Order extends BaseController
 
         // calculate product discount, state, etc...
         $data['products'] = $this->_set_products_info($products);
+
+        // get order total items and total price
+        $data['total_items'] = get_total_order_items();
+        $data['total_price'] = get_total_order_price();
 
         return view('order/main_page', $data);
     }
@@ -169,10 +175,45 @@ class Order extends BaseController
         ]);
     }
 
+    /**
+     * Displays the checkout page with order summary and product details.
+     * 
+     * This function retrieves the current order from the session and prepares the data
+     * needed to display the checkout page. It calculates the total number of items and the
+     * total price of the order. It also retrieves detailed information about each product
+     * in the order, including quantity and total price, and checks for any promotions.
+     * Finally, it renders the checkout page with the prepared data.
+     * 
+     * @return View The rendered view of the checkout page.
+     */
     public function checkout()
     {
-        // show checkout page
-        dd(get_order());
+        // get the order
+        $order = get_order();
+
+        // prepare data to display
+        $data['total_products'] = get_total_order_items();
+        $data['total_price'] = get_total_order_price();
+
+        $order_products = [];
+        foreach ($order['items'] as $id => $item) {
+            // get product details
+            $product = $this->_get_product_by_id($id);
+
+            // addicional product details based on the order
+            $product['quantity'] = $item['quantity'];
+            // total price of the order ( check for promotion )
+            $this->_check_product_promotion($product);
+            $product['total_price'] = $item['quantity'] * $item['price'];
+
+            // add product to the list
+            $order_products[] = $product;
+        }
+
+        $data['order_products'] = $order_products;
+
+        // display checkout page
+        return view('order/order_checkout', $data);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -307,7 +348,7 @@ class Order extends BaseController
 
         // get product by id
         foreach ($products as $product) {
-            if ($product['id'] === $id) {
+            if ($product['id'] == $id) {
                 return $product;
             }
         }

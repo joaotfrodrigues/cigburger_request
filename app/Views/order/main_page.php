@@ -6,14 +6,15 @@
     <div class="row justify-content-center">
         <div class="col-10 card p-4">
 
-            <!-- categories -->
-            <?= $this->include('order/order_categories') ?>
-
-            <div class="text-center mt-5">
-                <h3><?= $selected_category ?></h3>
+            <div class="mb-5">
+                <?= $this->include('order/order_categories') ?>
             </div>
 
-            <div class="my-5">
+            <div class="mb-5">
+                <?= $this->include('order/order_info') ?>
+            </div>
+
+            <div class="mb-5">
                 <?= $this->include('order/products') ?>
             </div>
 

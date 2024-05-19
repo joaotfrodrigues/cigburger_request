@@ -131,14 +131,14 @@ if (!function_exists('update_order')) {
         if (key_exists($product_id, $order['items'])) {
             if ($quantity == 0) {
                 // remove product from order
-                unset($order['items'][$id]);
+                unset($order['items'][$product_id]);
             } else {
                 // update product quantity
                 $order['items'][$product_id]['quantity'] = $quantity;
             }
         } else {
             // check if quantity is 0
-            if (quantity === 0) return;
+            if ($quantity === 0) return;
 
             // add new product to the order
             $order['items'][$product_id] = [
@@ -149,5 +149,30 @@ if (!function_exists('update_order')) {
 
         // update order in session
         session()->set('order', $order);
+    }
+}
+
+if (!function_exists('get_total_order_price')) {
+    /**
+     * Calculates the total price of all items in the current order.
+     * 
+     * This function retrieves the current order from the session and iterates through the order items,
+     * calculating the total price based on the quantity and price of each item. It returns the total
+     * price of all items in the order.
+     * 
+     * @return float The total price of all items in the current order.
+     */
+    function get_total_order_price()
+    {
+        // get order from session
+        $order = get_order();
+
+        // get total price
+        $total = 0;
+        foreach ($order['items'] as $item) {
+            $total += $item['quantity'] * $item['price'];
+        }
+
+        return $total;
     }
 }
