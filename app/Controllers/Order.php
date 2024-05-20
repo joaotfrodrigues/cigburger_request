@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\ApiModel;
 use CodeIgniter\HTTP\ResponseInterface;
+use getID3;
 
 class Order extends BaseController
 {
@@ -329,8 +331,16 @@ class Order extends BaseController
             return redirect()->back()->with('error', 'O PIN introduzido não é válido.');
         }
 
-        echo 'Vamos confirmar o pedido';
-        die;
+        // prepare data to send the request to the CigBurger API
+        $data = [
+            'restaurant_id' => session()->get('restaurant_details')['project_id'],
+            'order' => get_order(),
+            'machine_id' => session()->get('machine_id')
+        ];
+
+        // send request to the API
+        $api = new ApiModel();
+        $response = $api->request_checkout($data);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

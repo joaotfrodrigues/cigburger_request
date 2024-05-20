@@ -145,6 +145,10 @@ class Main extends BaseController
                 $this->init_error('Config file is not valid: api_key is missing');
             }
 
+            if (!key_exists('machine_id', $config)) {
+                $this->init_error('Config file is not valid: machine_id is missing');
+            }
+
             // check if api url is valid
             if (!filter_var($config['api_url'], FILTER_VALIDATE_URL)) {
                 $this->init_error('Config file is not valid: api_url is not a valid url');

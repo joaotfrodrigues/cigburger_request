@@ -28,6 +28,43 @@ class ApiModel extends Model
     }
 
     /**
+     * Retrieves the status from the CigBurger API.
+     * 
+     * This function sends a request to the 'get_status' endpoint of the CigBurger API
+     * to retrieve the status information. It returns the decoded JSON response from
+     * the API, containing the status details.
+     * 
+     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
+     */
+    public function get_status()
+    {
+        return $this->api('get_status');
+    }
+
+    /**
+     * Retrieves restaurant details from the CigBurger API.
+     * 
+     * This function sends a request to the 'get_restaurant_details' endpoint of the
+     * CigBurger API to retrieve detailed information about the restaurant. It returns
+     * the decoded JSON response from the API, containing the restaurant details.
+     * 
+     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
+     */
+    public function get_restaurant_details()
+    {
+        return $this->api('get_restaurant_details');
+    }
+
+    public function request_checkout($data)
+    {
+        dd($data);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // PRIVATE METHODS
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Makes a request to the CigBurger API endpoint.
      * 
      * This function sends a request to the specified endpoint of the CigBurger API
@@ -94,33 +131,5 @@ class ApiModel extends Model
         $encrypter = \Config\Services::encrypter();
 
         return bin2hex($encrypter->encrypt($data));
-    }
-
-    /**
-     * Retrieves the status from the CigBurger API.
-     * 
-     * This function sends a request to the 'get_status' endpoint of the CigBurger API
-     * to retrieve the status information. It returns the decoded JSON response from
-     * the API, containing the status details.
-     * 
-     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
-     */
-    public function get_status()
-    {
-        return $this->api('get_status');
-    }
-
-    /**
-     * Retrieves restaurant details from the CigBurger API.
-     * 
-     * This function sends a request to the 'get_restaurant_details' endpoint of the
-     * CigBurger API to retrieve detailed information about the restaurant. It returns
-     * the decoded JSON response from the API, containing the restaurant details.
-     * 
-     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
-     */
-    public function get_restaurant_details()
-    {
-        return $this->api('get_restaurant_details');
     }
 }
