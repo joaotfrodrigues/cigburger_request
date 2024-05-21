@@ -20,7 +20,7 @@ To set up the project, follow these steps:
     ```bash
     composer install
 4. **Configure Environment Variables:**
-    - Update the .env file with your database and other configuration settings.
+    - Update the .env and Constants.php files with your settings.
 5. **Start the Development Server:**
     ```bash
     php spark serve
