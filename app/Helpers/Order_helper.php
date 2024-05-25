@@ -4,8 +4,8 @@ if (!function_exists('init_order')) {
     /**
      * Initializes a new order by clearing any existing order data and setting up a new order structure.
      * 
-     * This function clears any previous order using `delete_order`, and then initializes a new order
-     * in the session with an empty items list and a status of 'new'.
+     * This function clears any previous order using `delete_order`, sets the selected category to 'Todos', 
+     * and then initializes a new order in the session with an empty items list and a status of 'new'.
      * 
      * @return void
      */
@@ -13,6 +13,9 @@ if (!function_exists('init_order')) {
     {
         // clear the previous order, if exists
         delete_order();
+
+        // set selected category
+        session()->set('selected_category', 'Todos');
 
         // set new order
         session()->set('order', [
@@ -174,5 +177,33 @@ if (!function_exists('get_total_order_price')) {
         }
 
         return $total;
+    }
+}
+
+if (!function_exists('update_order_with_order_and_series_number')) {
+    /**
+     * Updates the order with the order ID, order number, and order series number.
+     * 
+     * This function retrieves the current order from the session, updates it with the given order ID, order number,
+     * and order series number, and then saves the updated order back into the session.
+     * 
+     * @param int $order_id The ID of the order.
+     * @param int $order_number The order number derived from the order ID.
+     * @param int $order_series The order series number derived from the order ID.
+     * 
+     * @return void
+     */
+    function update_order_with_order_and_series_number($order_id, $order_number, $order_series)
+    {
+        // get order from session
+        $order = get_order();
+
+        // update order with order and series number
+        $order['order_id'] = $order_id;
+        $order['order_number'] = $order_number;
+        $order['order_series'] = $order_series;
+
+        // update order in session
+        session()->set('order', $order);
     }
 }

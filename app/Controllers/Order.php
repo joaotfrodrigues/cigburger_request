@@ -315,6 +315,15 @@ class Order extends BaseController
         return view('order/checkout_payment_process', $data);
     }
 
+    /**
+     * Confirms the payment during the checkout process.
+     * 
+     * This function handles the final confirmation of the payment during the checkout process. It validates the PIN entered by the user, 
+     * prepares the necessary data for the API request, and processes the payment through the CigBurger API. If the payment is successful, 
+     * it generates the order number and series, updates the order session, and displays the order receipt.
+     * 
+     * @return RedirectResponse The redirect response with error message if validation or API request fails.
+     */
     public function checkout_payment_confirm()
     {
         // get pin value
@@ -338,9 +347,44 @@ class Order extends BaseController
             'machine_id' => session()->get('machine_id')
         ];
 
+        // set order status as paid
+        $data['order']['status'] = 'paid';
+
         // send request to the API
         $api = new ApiModel();
         $response = $api->request_checkout($data);
+
+        // check if there was an error | products out of stock | products unavailable
+        if ($response['status'] === 400) {
+            return redirect()->back()->with('error', 'O seu pedido não pode ser processado. Por favor, digija-se ao balcão.');
+        }
+
+        // add additional data to the order
+        $data['id_restaurant'] = session()->get('restaurant_details')['id'];
+
+        // calculate total price
+        $data['total_price'] = get_total_order_price();
+
+        // everything is ok, send the order to the api
+        $response = $api->request_final_confirmation($data);
+
+        // check if there was an error
+        if ($response['status'] === 400) {
+            return redirect()->back()->with('error', 'O seu pedido não pode ser processado. Por favor, digija-se ao balcão.');
+        }
+
+        // get the order id and calculate the order number and series
+        $id_order = $response['data']['id_order'];
+
+        $order_id_and_series = define_order_number_from_id($id_order);
+
+        $order_number = $order_id_and_series['order_number'];
+        $order_series = $order_id_and_series['order_series'];
+
+        // add order number and series to the order in session
+        update_order_with_order_and_series_number($id_order, $order_number, $order_series);
+
+        $this->_show_order_receipt();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -481,5 +525,53 @@ class Order extends BaseController
         }
 
         return null;
+    }
+
+    /**
+     * Displays the order receipt with detailed order information.
+     * 
+     * This function retrieves the current order from the session and prepares the data needed to display the order receipt.
+     * It collects product details, calculates total prices, and includes additional order information such as order ID,
+     * order number, and order series. It also includes restaurant details. Finally, it renders the order receipt view with
+     * the prepared data.
+     * 
+     * @return void
+     */
+    private function _show_order_receipt()
+    {
+        // get the order
+        $order = get_order();
+
+        // prepare data to display
+        $data['total_products'] = get_total_order_items();
+        $data['total_price'] = get_total_order_price();
+
+        $order_products = [];
+        foreach ($order['items'] as $id => $item) {
+            // get product details
+            $product = $this->_get_product_by_id($id);
+
+            // addicional product details based on the order
+            $product['quantity'] = $item['quantity'];
+            // total price of the order ( check for promotion )
+            $this->_check_product_promotion($product);
+            $product['total_price'] = $item['quantity'] * $item['price'];
+
+            // add product to the list
+            $order_products[] = $product;
+        }
+
+        $data['order_products'] = $order_products;
+
+        // get order id, number and series
+        $data['order_id'] = $order['order_id'];
+        $data['order_number'] = $order['order_number'];
+        $data['order_series'] = $order['order_series'];
+
+        // add restaurant details
+        $data['restaurant_details'] = session()->get('restaurant_details');
+
+        // show order receipt
+        echo view('order/order_receipt', $data);
     }
 }

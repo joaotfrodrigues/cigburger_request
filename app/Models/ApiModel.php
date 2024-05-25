@@ -57,7 +57,12 @@ class ApiModel extends Model
 
     public function request_checkout($data)
     {
-        dd($data);
+        return $this->api('request_checkout', 'POST', $data);
+    }
+
+    public function request_final_confirmation($data)
+    {
+        return $this->api('request_final_confirmation', 'POST', $data);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
