@@ -1,10 +1,22 @@
 # CigBurger Request Project
 
+## 📋 Table of Contents
+- [❓ What is this?](#-what-is-this)
+- [🚀 Prerequisites](#-prerequisites)
+- [🛠️ Setup](#️-setup)
+
 ## ❓ What is this?
 
 ⚠️ Warning: This repository contains only a third of the course project. For the complete project, please check out CigBurger Backoffice and CigBurger Kitchen in my profile.
 
 This is my version of the CigBurger Request project built in the course "[2024] CodeIgniter 4 - 3 large PROFESSIONAL projects united by APIs | MVC | PHP8 | MySQL | All about one structure!"
+
+## 🚀 Prerequisites
+Before setting up the project, ensure you have the following installed:
+- PHP 8.0 or higher
+- MySQL 5.7 or higher
+- Composer
+- Git
 
 ## 🛠️ Setup
 
