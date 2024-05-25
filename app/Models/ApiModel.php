@@ -55,11 +55,31 @@ class ApiModel extends Model
         return $this->api('get_restaurant_details');
     }
 
+    /**
+     * Sends a checkout request to the CigBurger API.
+     *
+     * This function sends a POST request to the 'request_checkout' endpoint of the
+     * CigBurger API with the provided data to initiate the checkout process. It returns
+     * the decoded JSON response from the API, containing the checkout details or status.
+     *
+     * @param array $data The data to be sent in the checkout request.
+     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
+     */
     public function request_checkout($data)
     {
         return $this->api('request_checkout', 'POST', $data);
     }
 
+    /**
+     * Sends a final confirmation request to the CigBurger API.
+     *
+     * This function sends a POST request to the 'request_final_confirmation' endpoint of the
+     * CigBurger API with the provided data to finalize the order. It returns the decoded
+     * JSON response from the API, containing the final confirmation details or status.
+     *
+     * @param array $data The data to be sent in the final confirmation request.
+     * @return array|null The decoded JSON response from the CigBurger API, or null if an error occurs.
+     */
     public function request_final_confirmation($data)
     {
         return $this->api('request_final_confirmation', 'POST', $data);
