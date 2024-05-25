@@ -49,12 +49,27 @@ To set up the project, follow these steps:
     - Open your web browser and go to http://localhost/cigburger_request/public/
 
 ## ⚙️ Important Configuration<a name="important-configuration"></a>
-- **API_IMAGES_URL:**
-    - Ensure you update the **API_IMAGES_URL** constant in the configuration file to match the URL of your CigBurger Backoffice. This constant is crucial for linking to images hosted on the backoffice server.
-    - You can find this constant in **app\Config\Constants.php**
-        ```bash
+To set up the project's important configurations, follow these steps:
+
+1. **Update `config.json` for API URL:**
+    - Open the `config.json` file located in the project's root directory.
+    - Modify the `api_url` value to include the `/api` endpoint from your CigBurger Backoffice.
+        ```json
+        {
+            "api_url": "http://localhost/cigburger_backoffice/public/api/",
+            "project_id": "100",
+            "api_key": "j3fEehdw0puDbVJeNK8VMXtgJhibg0jO",
+            "machine_id": "XDFFGFRT"
+        }
+        ```
+    - Replace `"http://localhost/cigburger_backoffice/public/api/"` with the actual URL of your CigBurger Backoffice API endpoint.
+
+2. **Update `API_IMAGES_URL` in Constants.php:**
+    - Open the `Constants.php` file located at `app\Config\Constants.php`.
+    - Update the `API_IMAGES_URL` constant to match the URL of your CigBurger Backoffice for accessing images.
+        ```php
         define('API_IMAGES_URL', 'http://your-backoffice-url.com/path/to/images/');
         ```
-    - Replace 'http://your-backoffice-url.com/path/to/images/' with the actual URL of your backoffice server.
+    - Replace `'http://your-backoffice-url.com/path/to/images/'` with the actual URL of your backoffice server where images are hosted.
 
 By following these steps, you should have your CigBurger Request project set up and ready to use. Make sure to check out the other parts of the project, CigBurger Backoffice and CigBurger Kitchen, to complete the full course project.
