@@ -8,6 +8,8 @@ This is my version of the CigBurger Request project built in the course "[2024] 
 
 ## 🛠️ Setup
 
+⚠️ **Warning:** The database structure used in this project is created by the CigBurger Backoffice project. Ensure that you have the CigBurger Backoffice set up and the database initialized before running this project.
+
 To set up the project, follow these steps:
 
 1. **Clone the Repository:**
@@ -20,7 +22,13 @@ To set up the project, follow these steps:
     ```bash
     composer install
 4. **Configure Environment Variables:**
-    - Update the .env and Constants.php files with your settings.
+    - Edit the `.env` file in the project root. If it does not exist, create it.
+    - Modify or add the following configuration setting:
+        ```dotenv
+        CI_ENVIRONMENT=development
+        ```
+      The `CI_ENVIRONMENT` variable can be set to either `development` or `production` depending on your needs.
+    - Update the `APP_BASEURL` variable in the `.env` file to reflect the correct base URL for the application.
 5. **Start the Development Server:**
     ```bash
     php spark serve
