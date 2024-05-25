@@ -4,6 +4,7 @@
 - [❓ What is this?](#-what-is-this)
 - [🚀 Prerequisites](#-prerequisites)
 - [🛠️ Setup](#️-setup)
+- [⚙️ Important Configuration](#-important-configuration)
 
 ## ❓ What is this?
 
