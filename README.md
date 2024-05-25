@@ -48,7 +48,7 @@ To set up the project, follow these steps:
 6. **Access the Application:**
     - Open your web browser and go to http://localhost/cigburger_request/public/
 
-## ⚙️ Important Configuration
+## ⚙️ Important Configuration<a name="important-configuration"></a>
 - **API_IMAGES_URL:**
     - Ensure you update the **API_IMAGES_URL** constant in the configuration file to match the URL of your CigBurger Backoffice. This constant is crucial for linking to images hosted on the backoffice server.
     - You can find this constant in **app\Config\Constants.php**
