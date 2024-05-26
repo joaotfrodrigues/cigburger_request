@@ -10,7 +10,7 @@
 
             <hr>
 
-            <p class="display-1 text-center my-0 py-0"><strong><?= $order_number ?></strong></p>
+            <p class="display-1 text-center my-0 py-0"><strong><?= str_pad($order_number, 3, '0', STR_PAD_LEFT) ?></strong></p>
             <p class="order-resume-final-font text-center">Por favor, dirija-se ao balcão, assim que os nossos colaborados o informarem que o seu pedido está pronto.</p>
 
             <div class="order-resume-final-font text-center">

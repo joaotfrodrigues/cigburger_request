@@ -373,10 +373,12 @@ class Order extends BaseController
             return redirect()->back()->with('error', 'O seu pedido não pode ser processado. Por favor, digija-se ao balcão.');
         }
 
-        // get the order id and calculate the order number and series
+        // get the order number and calculate the order number and series
+        $new_order_number = $response['data']['order_number'];
+        
         $id_order = $response['data']['id_order'];
 
-        $order_id_and_series = define_order_number_from_id($id_order);
+        $order_id_and_series = define_order_number_from_last_order_number($new_order_number);
 
         $order_number = $order_id_and_series['order_number'];
         $order_series = $order_id_and_series['order_series'];

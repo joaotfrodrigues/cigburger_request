@@ -17,28 +17,28 @@ if (!function_exists('format_currency')) {
     }
 }
 
-if (!function_exists('define_order_number_from_id')) {
+if (!function_exists('define_order_number_from_last_order_number')) {
     /**
-     * Defines the order number and series from the order ID.
+     * Defines the order number and series from the given order number.
      * 
-     * This function calculates the order number and series based on the given order ID. If the order ID is less than 100,
-     * the order number is the same as the order ID and the order series is set to 0. If the order ID is 100 or greater,
-     * the order number is calculated as the order ID modulo 100, and the order series is calculated as the integer division
-     * of the order ID by 100.
+     * This function calculates the order number and series based on the given order number. If the order number is less than 100,
+     * the order number remains the same and the order series is set to 0. If the order number is 100 or greater,
+     * the order number is calculated as the order number modulo 100, and the order series is calculated as the integer division
+     * of the order number by 100.
      * 
-     * @param int $order_id The ID of the order.
+     * @param int $new_order_number The order number.
      * 
      * @return array An associative array containing the 'order_number' and 'order_series'.
      */
-    function define_order_number_from_id($order_id)
+    function define_order_number_from_last_order_number($new_order_number)
     {
         // defines the order number and series from the order id
-        if ($order_id < 100) {
-            $order_number = $order_id;
+        if ($new_order_number < 100) {
+            $order_number = $new_order_number;
             $order_series = 0;
         } else {
-            $order_number = $order_id % 100;
-            $order_series = floor($order_id / 100);
+            $order_number = $new_order_number % 100;
+            $order_series = floor($new_order_number / 100);
         }
 
         return [
