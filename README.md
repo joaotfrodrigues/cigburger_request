@@ -23,6 +23,8 @@ Before setting up the project, ensure you have the following installed:
 
 ⚠️ **Warning:** The database structure used in this project is created by the CigBurger Backoffice project. Ensure that you have the CigBurger Backoffice set up and the database initialized before running this project.
 
+⚠️ **Important:** You need to download the configuration file from the API tab in CigBurger Backoffice and update the current `config.json` in both the CigBurger Request and CigBurger Kitchen projects. Failure to do so will result in the API not working and the application showing an error.
+
 To set up the project, follow these steps:
 
 1. **Clone the Repository:**
@@ -42,11 +44,15 @@ To set up the project, follow these steps:
         ```
       The `CI_ENVIRONMENT` variable can be set to either `development` or `production` depending on your needs.
     - Update the `APP_BASEURL` variable in the `.env` file to reflect the correct base URL for the application.
-5. **Start the Development Server:**
+5. **Update Configuration File:**
+    - Download the `config.json` file from the API tab in CigBurger Backoffice.
+    - Replace the current `config.json` file in the CigBurger Request project directory with the downloaded `config.json`.
+6. **Start the Development Server:**
     ```bash
     php spark serve
-6. **Access the Application:**
+7. **Access the Application:**
     - Open your web browser and go to http://localhost/cigburger_request/public/
+
 
 ## ⚙️ Important Configuration<a name="important-configuration"></a>
 To set up the project's important configurations, follow these steps:
